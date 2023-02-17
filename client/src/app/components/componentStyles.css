@@ -1,0 +1,37 @@
+.formWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.formInputs {
+  width: 200px;
+  height: 18px;
+  padding: 10px;
+  border: 1px solid green;
+  border-radius: 5px;
+}
+
+.formInputs:focus {
+  outline-color: chartreuse;
+}
+
+.btn {
+  width: 200px;
+  height: 40px; 
+  padding: 10px;
+  margin-left: 10px;
+  color: #FFFFFF;
+  border: 1px solid green;
+  border-radius: 5px;
+  background-color: green;
+  cursor: pointer;
+  transition: all ease-in-out 0.3ms;
+}
+
+.btn:hover {
+  
+  color: green;
+  border: 1px solid chartreuse;
+  background-color: chartreuse;
+}
