@@ -5,7 +5,6 @@ import ReactEcharts             from "echarts-for-react"
 
 import { 
   title, 
-  visualMap, 
   tooltip, 
   xAxis, 
   yAxis 
@@ -59,27 +58,30 @@ const Home = () => {
 
   function appendToDataframe(df: dfd.DataFrame, dataToAdd: any[]) {  // previous dataToAdd type is object[]
     const numberOfIndices: number = dataToAdd.length
-    // print dataframe to console
     df.print()
     let tempStartIndex = Math.max(...df.index.map(i => +i)) + 1 
     // find the maximum number of existing indices
-    let startIndex = tempStartIndex
-    if(startIndex === -Infinity) {
-      startIndex = 0
-    }
+    const startIndex = tempStartIndex === -Infinity ? 0 : tempStartIndex 
     const indices = Array.from(Array(numberOfIndices), (_, index) => index + startIndex)
     // Return the df.append with values and indices
     return df.append(dataToAdd.map(d => [d.x, d.y]), indices)
   }
-
-  let maxValue = df.max({ axis: 0 }) 
-  console.log(maxValue)
-  let minValue = df.min({ axis: 0 })
-  console.log(minValue)
-
+  
+  let maxValueWithinDf = df.max().values
+  let minValueWithinDf = df.min().values  
+  let maxVal = Math.max(...maxValueWithinDf.map(i => +i))
+  let minVal = Math.min(...minValueWithinDf.map(i => +i))
+ 
   const options = {
     title,
-    visualMap,
+    visualMap: {
+      min: minVal === Infinity  ? 0 : minVal,
+      max: maxVal === -Infinity ? 0 : maxVal,
+      calculable: true,
+      inRange: {
+        color: ['blue', 'chartreuse', 'red']
+      }
+    },
     tooltip,
     xAxis,
     yAxis,
@@ -95,13 +97,7 @@ const Home = () => {
     ]
   }
 
-  // const arr = [1, 2, 3]
-  // let dfX = df.values.map((x) => x)
-  // let maxValue: any = Math.max(...arr)
-  // let minValue = Math.min(...arr)
-  // console.log("DFX", dfX)
-  // console.log("Max", maxValue)
-  // console.log("Min", minValue)
+  // TODO: Colour along the x axis next to create a gradient effect
 
   return (
     <PageBody>

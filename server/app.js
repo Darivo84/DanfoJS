@@ -51,14 +51,13 @@ app.get('/random-scatter-data', (req, res) => {
       Array.from({ length: n }, () => Math.floor(Math.random() * (max - min + 1)) + min)
       
   // let valueOfTheKey = 'pwal'
-  let x = Object.values(randomArrayInRange(-50, 50, 5)).map((i) => i)
-  let y = Object.values(randomArrayInRange(-50, 50, 5)).map((i) => i)
+  let maxRange = 50
+  let minRange = -50
+  let x = Object.values(randomArrayInRange(minRange, maxRange, 5)).map((i) => i)
+  let y = Object.values(randomArrayInRange(minRange, maxRange, 5)).map((i) => i)
   let zip = (x, y) => Array.from(Array(Math.max(x.length, y.length)), (_, i) => [x[i], y[i]])
   let numericData = zip(x, y).map((arr) => { return { x: arr[0], y: arr[1] }}) // "key": valueOfTheKey,
-  // console.log(numericData)
-  
-  // let maxArrValue = Math.max(...numericData[x])
-  // console.log(maxArrValue)
+ 
   res.send(numericData)
 })
 
