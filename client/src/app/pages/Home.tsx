@@ -72,11 +72,11 @@ const Home = () => {
     return df.append(dataToAdd.map(d => [d.x, d.y]), indices)
   }
 
-  /* TODO: 
-    Next step is to automatically calculate the min and max in visualMap for color mapping 
-    - find the min value of x and y in the same way I, possibly check something like this => console.log(df.sortValues("x", { inplace: true }))
-  */
-   
+  let maxValue = df.max({ axis: 0 }) 
+  console.log(maxValue)
+  let minValue = df.min({ axis: 0 })
+  console.log(minValue)
+
   const options = {
     title,
     visualMap,
@@ -95,18 +95,13 @@ const Home = () => {
     ]
   }
 
-  // map df.values to separate x and y values
-  // const dfX = df.values.map((x, y) => ({x, y}))
   // const arr = [1, 2, 3]
-  // const arr1 = [4, 5, 6]
-  // const max = Math.max(...arr)
-  // const min = Math.min(...arr)
-  // console.log(max, min)
-  // console.log(df.values)
-  // console.log(dfX)
-
-  // const merged = [...df.values]
-  // console.log(merged)
+  // let dfX = df.values.map((x) => x)
+  // let maxValue: any = Math.max(...arr)
+  // let minValue = Math.min(...arr)
+  // console.log("DFX", dfX)
+  // console.log("Max", maxValue)
+  // console.log("Min", minValue)
 
   return (
     <PageBody>
