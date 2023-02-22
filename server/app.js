@@ -1,64 +1,44 @@
 const express    = require('express')
 const bodyParser = require('body-parser')
 const cors       = require('cors')
+const http       = require('http')
 const sequelize  = require('./db')
-const Step       = require('./models/Step')
+const stepRoutes = require('./routes/Steps')
+const randomData = require('./routes/RandomScatterData')
+const { Server } = require('socket.io')
 
 sequelize.sync({ force: true }).then(() => console.log('DB connection established'))
 
-const app  = express()
-const PORT = 5000
+const app    = express()
+const PORT   = 5000
+const server = http.createServer(app)
 
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+app.use('/steps', stepRoutes)
+app.use('/random-scatter-data', randomData)
 
-app.post('/steps', async (req, res) => {
-  await Step.create(req.body)
-  res.send('Row inserted successfully')
+const io = new Server(server, {
+  cors: {
+    origin: 'https://localhost:3000',
+    methods: ["GET", "POST"]
+  }
 })
 
-app.get('/steps', async (req, res) => {
-  const steps = await Step.findAll()
-  res.send(steps)
+io.on("connection", (socket) => {
+  console.log(`UI connected: ${socket.id}`)
+
+  socket.on("subscribe", () => {
+    socket.join()
+    console.log(`Subscribed: ${socket.id}`)
+  })
+
+  socket.on("disconnect", () => {
+    console.log("Connection closed", socket.id)
+  })
 })
 
-app.get('/steps/:id', async (req, res) => {
-  const requestedId = req.params.id
-  const step = await Step.findOne({ where: { id: requestedId } })
-  res.send(step)
-})
+io.off("unsubscribe", (socket) => console.log(`Unsubscibed: ${socket.id}`))
 
-app.put('/steps/:id', async (req, res) => {
-  const requestedId = req.params.id
-  const step = await Step.findOne({ where: { id: requestedId } })
-  step.key = req.body.key
-  step.x = req.body.x
-  step.y = req.body.y
-  await step.save()
-  res.send('Updated successful')
-})
-
-app.delete('/steps/:id', async (req, res) => {
-  const requestedId = req.params.id
-  await Step.destroy({ where: { id: requestedId } })
-  res.send('Delete successful')
-})
-
-
-app.get('/random-scatter-data', (req, res) => {
-  let randomArrayInRange = (min, max, n = 100) =>
-      Array.from({ length: n }, () => Math.floor(Math.random() * (max - min + 1)) + min)
-      
-  // let valueOfTheKey = 'pwal'
-  let maxRange = 50
-  let minRange = -50
-  let x = Object.values(randomArrayInRange(minRange, maxRange, 5)).map((i) => i)
-  let y = Object.values(randomArrayInRange(minRange, maxRange, 5)).map((i) => i)
-  let zip = (x, y) => Array.from(Array(Math.max(x.length, y.length)), (_, i) => [x[i], y[i]])
-  let numericData = zip(x, y).map((arr) => { return { x: arr[0], y: arr[1] }}) // "key": valueOfTheKey,
- 
-  res.send(numericData)
-})
-
-app.listen(PORT, () => console.log(`Server running on ${PORT}`))
+server.listen(PORT, () => console.log(`Server running on ${PORT}`))
